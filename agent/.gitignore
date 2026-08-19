@@ -1,1 +1,3 @@
 venv/
+agent.db
+.vscode/
