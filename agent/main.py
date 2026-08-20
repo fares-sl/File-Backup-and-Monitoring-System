@@ -1,9 +1,7 @@
-import watcher.py
+import watcher
 import time
-
-def getPayload(conn):
-    cur = getActions(conn)
-    
+import utilities
+import config
 
 conn = createConnection()
 handler = ChangeHandler()
@@ -14,8 +12,10 @@ while True:
     payload = getPayload(conn)
     sendPayload(payload)
     respnse = receivePayload()
-    if respnse:
-        maxActionList = generateMaxActionPairList(payload)
+    if respnse != None:
+        newConfig = fetchNewConfig(response)
+        updateConfig(newConfig, WATCHED_ROOTS, WATCHED_EXTENSIONS)
+        maxActionList = payload.generateMaxActionPairList()
         flushActions(conn, maxActionList)
         uploadPathsList = getUploadPathsList(respnse)
         uploadFiles(uploadPathsList)
