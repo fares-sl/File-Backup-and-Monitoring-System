@@ -4,3 +4,4 @@ ENDPOINT = "/api/actions"
 TIMEOUT = 5
 WATCHED_EXTENSIONS = ['.txt','.py']
 WATCHED_ROOTS = ['test_folder/']
+PERIOD = 1800

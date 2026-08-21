@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 import getpass
 
+
 def fetchActionList(cur):
     actionList = []
     action = cur.fetchone()
@@ -59,3 +60,9 @@ def getTime():
 
 def getUser():
     return getpass.getuser()
+
+def fetchActionCount(conn, filePath):
+    actionCount = searchPath(conn, filePath)
+    if not actionCount:
+        createPath(conn, filePath)
+    return actionCount

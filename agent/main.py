@@ -1,5 +1,4 @@
 import watcher
-import time
 import utilities
 import config
 
@@ -8,14 +7,16 @@ handler = ChangeHandler()
 observer = Observer()
 observer.schedule(handler, "/", recursive = True)
 while True:
-    time.sleep(period)
+    time.sleep(PERIOD)
     payload = getPayload(conn)
     sendPayload(payload)
-    respnse = receivePayload()
-    if respnse != None:
+    response = receivePayload()
+    if response != None:
         newConfig = fetchNewConfig(response)
-        updateConfig(newConfig, WATCHED_ROOTS, WATCHED_EXTENSIONS)
+        WATCHED_ROOTS = newConfig.roots
+        WATCHED_EXTENSIONS = newConfig.extensions
+        PERIOD = newConfig.period
         maxActionList = payload.generateMaxActionPairList()
         flushActions(conn, maxActionList)
-        uploadPathsList = getUploadPathsList(respnse)
+        uploadPathsList = getUploadPathsList(response)
         uploadFiles(uploadPathsList)
