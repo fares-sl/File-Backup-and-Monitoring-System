@@ -2,9 +2,9 @@ from local_db import fetchLastAction, modifyActionCount, createAction
 from classes import Action
 from utilities import getTime , getUser, fetchActionCount
 
-def actionHandler(conn, filePath, action):
+def actionHandler(conn, filePath, action, oldPath = None):
     actionCount = fetchActionCount(conn, filePath)
-    createAction(conn, filePath, action, actionCount + 1, getUser(), getTime())
+    createAction(conn, filePath, action, actionCount + 1, getUser(), getTime(), oldPath)
     modifyActionCount(conn, filePath, actionCount + 1)
     conn.commit()
 
@@ -23,7 +23,7 @@ def deleteFileHandler(conn, filePath):
     action = Action.DELETE
     actionHandler(conn, filePath, action.value)
 
-def moveFileHandler(conn, filePath):
+def moveFileHandler(conn, filePath, oldPath):
     action = Action.MOVE
-    actionHandler(conn, filePath, action.value)
+    actionHandler(conn, filePath, action.value, oldPath)
 

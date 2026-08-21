@@ -1,19 +1,22 @@
-import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from local_db import createConnection
+from actionHandler import createFileHandler, modifyFileHandler, deleteFileHandler, moveFileHandler
 
 class ChangeHandler(FileSystemEventHandler):
+    def __init__(self):
+        self.conn = createConnection()
     def on_created(self, event):
         if not event.is_directory:
-            print(f'created: {event.src_path}')
+            createFileHandler(self.conn, event.src_path)
 
     def on_modified(self, event):
         if not event.is_directory:
-            print(f'modified: {event.src_path}')
+            modifyFileHandler(self.conn, event.src_path)
 
     def on_deleted(self, event):
-        if not event.is_directory:
-            print(f"DELETED: {event.src_path}")
+            deleteFileHandler(self.conn, event.src_path)
+            
 
     def on_moved(self, event):
         if not event.is_directory:

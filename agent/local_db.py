@@ -39,7 +39,7 @@ def searchPath(conn, pathName):
 def modifyActionCount(conn, pathName, actionCount):
     conn.execute('UPDATE paths SET action_count = ? WHERE filepath = ?;', (actionCount, pathName))
 
-def createAction(conn, pathName, action, actionNumber, user, actionTime, oldPath=None):
+def createAction(conn, pathName, action, actionNumber, user, actionTime, oldPath):
     conn.execute("""INSERT INTO actions (filepath, action, action_number, user, action_time, old_path)
      VALUES (?,?,?,?,?,?);""",
      (pathName, action, actionNumber, user, actionTime, oldPath)
