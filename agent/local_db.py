@@ -30,7 +30,6 @@ def createPath(conn, pathName):
     conn.execute("INSERT INTO paths (filepath, action_count) VALUES (?, ?);",(pathName, 0))
 
 def searchPath(conn, pathName):
-    cur = conn.cursor()
     cur = conn.execute('SELECT action_count FROM paths WHERE filepath = ?;',(pathName,))
     result = cur.fetchone()
     if result is None:
@@ -40,14 +39,13 @@ def searchPath(conn, pathName):
 def modifyActionCount(conn, pathName, actionCount):
     conn.execute('UPDATE paths SET action_count = ? WHERE filepath = ?;', (actionCount, pathName))
 
-def createAction(conn, pathName, action, actionNumber, user, actionTime):
-    conn.execute("""INSERT INTO actions (filepath, action, action_number, user, action_time)
-     VALUES (?,?,?,?,?);""",
-     (pathName, action, actionNumber, user, actionTime)
+def createAction(conn, pathName, action, actionNumber, user, actionTime, oldPath=None):
+    conn.execute("""INSERT INTO actions (filepath, action, action_number, user, action_time, old_path)
+     VALUES (?,?,?,?,?,?);""",
+     (pathName, action, actionNumber, user, actionTime, oldPath)
      ) 
 
 def fetchLastAction(conn, filePath):
-    cur = conn.cursor()
-    cur.execute('SELECT action FROM actions WHERE filePath = ? AND action_number = (SELECT MAX(action_number) FROM actions WHERE filePath = ?);',(filePath,filePath))
+    cur = conn.execute('SELECT action FROM actions WHERE filePath = ? AND action_number = (SELECT MAX(action_number) FROM actions WHERE filePath = ?);',(filePath,filePath))
     result = cur.fetchone()
     return result[0] if result else None 

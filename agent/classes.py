@@ -34,8 +34,8 @@ class PathActions:
         self.maxActionNumber = maxActionNumber
         self.actionList = []
 
-    def appendAction(self, action, user, actionTime):
-        self.actionList.append((action, user, actionTime))
+    def appendAction(self, action, user, actionTime, oldPath):
+        self.actionList.append((action, user, actionTime, oldPath))
         self.maxActionNumber += 1
 
     def to_dict(self):

@@ -1,6 +1,7 @@
 import watcher
-import utilities
+from utilities import *
 import config
+from local_db import createConnection
 
 conn = createConnection()
 handler = ChangeHandler()
@@ -13,9 +14,9 @@ while True:
     response = receivePayload()
     if response != None:
         newConfig = fetchNewConfig(response)
-        WATCHED_ROOTS = newConfig.roots
-        WATCHED_EXTENSIONS = newConfig.extensions
-        PERIOD = newConfig.period
+        config.WATCHED_ROOTS = newConfig.roots
+        config.WATCHED_EXTENSIONS = newConfig.extensions
+        config.PERIOD = newConfig.period
         maxActionList = payload.generateMaxActionPairList()
         flushActions(conn, maxActionList)
         uploadPathsList = getUploadPathsList(response)

@@ -1,11 +1,10 @@
-import local_db
-import classes
+from local_db import searchPath, createPath, getActions
+from classes import Payload, PathActions
 import socket
-import json
 import requests
 from datetime import datetime
 import getpass
-
+import config
 
 def fetchActionList(cur):
     actionList = []
@@ -14,12 +13,12 @@ def fetchActionList(cur):
         return actionList
     pathActions = PathActions(action[0], action[2] - 1)
     actionList.append(pathActions)
-    actionList[-1].appendAction(action[1], action[3], action[4])
+    actionList[-1].appendAction(action[1], action[3], action[4], action[5])
     for action in cur:
         if action[0] != actionList[-1].pathName :
             pathActions = PathActions(action[0], action[2] - 1)
             actionList.append(pathActions)
-        actionList[-1].appendAction(action[1], action[3], action[4])
+        actionList[-1].appendAction(action[1], action[3], action[4], action[5])
     return actionList
 
 
@@ -32,7 +31,7 @@ def getPayload(conn):
 def sendPayload(payload):
     url = f"http://{config.SERVER_IP}:{config.SERVER_PORT}{config.ENDPOINT}"
 
-   try:
+    try:
         response = requests.post(
             url,
             json=payload.to_dict(),
