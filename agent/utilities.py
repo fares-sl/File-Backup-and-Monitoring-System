@@ -1,10 +1,11 @@
-from local_db import searchPath, createPath, getActions
+from local_db import searchPath, createPath, getActions, flushPathActions
 from classes import Payload, PathActions
 import socket
 import requests
 from datetime import datetime
 import getpass
 import config
+from pathlib import Path
 
 def fetchActionList(cur):
     actionList = []
@@ -65,3 +66,11 @@ def fetchActionCount(conn, filePath):
     if not actionCount:
         createPath(conn, filePath)
     return actionCount
+
+def flushActions(conn, maxActionList):
+    for path in maxActionList:
+        flushPathActions(conn, path[0], path[1])
+    conn.commit()
+
+def extension(filePath):
+    return Path(filePath).suffix

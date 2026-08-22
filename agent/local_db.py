@@ -1,7 +1,7 @@
 import sqlite3
 
-def createConnection():
-    conn = sqlite3.connect('agent.db', timeout = 5.0)
+def createConnection(dbName):
+    conn = sqlite3.connect(dbName, timeout = 5.0)
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("""CREATE TABLE IF NOT EXISTS paths (
                 filepath TEXT PRIMARY KEY,
@@ -49,3 +49,10 @@ def fetchLastAction(conn, filePath):
     cur = conn.execute('SELECT action FROM actions WHERE filePath = ? AND action_number = (SELECT MAX(action_number) FROM actions WHERE filePath = ?);',(filePath,filePath))
     result = cur.fetchone()
     return result[0] if result else None 
+
+def flushPathActions(conn, pathName, maxAction):
+    conn.execute('DELETE FROM actions WHERE filePath = ? and action_number <= ?',(pathName, maxAction))
+
+def fetchPaths(conn):
+    return conn.execute('SELECT * FROM paths ;')
+

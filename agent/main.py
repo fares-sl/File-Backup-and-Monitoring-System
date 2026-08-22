@@ -1,23 +1,25 @@
-import watcher
+from watcher import ChangeHandler, ConfigurateWatchers 
+from watchdog.observers import Observer
 from utilities import *
 import config
 from local_db import createConnection
+import time
 
-conn = createConnection()
+conn = createConnection(config.AGENT_DB)
 handler = ChangeHandler()
 observer = Observer()
-observer.schedule(handler, "/", recursive = True)
+watchers = {}
+ConfigurateWatchers(observer, handler, watchers, config.WATCHED_ROOTS)
+observer.start()
 while True:
-    time.sleep(PERIOD)
+    time.sleep(config.PERIOD)
     payload = getPayload(conn)
-    sendPayload(payload)
-    response = receivePayload()
-    if response != None:
-        newConfig = fetchNewConfig(response)
-        config.WATCHED_ROOTS = newConfig.roots
-        config.WATCHED_EXTENSIONS = newConfig.extensions
-        config.PERIOD = newConfig.period
+    respond = sendPayload(payload)
+    if respond != None:
+        config.WATCHED_ROOTS = respond['roots']
+        ConfigurateWatchers(observer, handler, watchers, config.WATCHED_ROOTS)
+        config.WATCHED_EXTENSIONS = respond['extensions']
+        config.PERIOD = respond['period']
         maxActionList = payload.generateMaxActionPairList()
         flushActions(conn, maxActionList)
-        uploadPathsList = getUploadPathsList(response)
-        uploadFiles(uploadPathsList)
+        uploadFiles(respond['paths'])

@@ -1,6 +1,8 @@
 from local_db import fetchLastAction, modifyActionCount, createAction
 from classes import Action
 from utilities import getTime , getUser, fetchActionCount
+from config import WATCHED_EXTENSIONS, WATCHED_ROOTS
+
 
 def actionHandler(conn, filePath, action, oldPath = None):
     actionCount = fetchActionCount(conn, filePath)
