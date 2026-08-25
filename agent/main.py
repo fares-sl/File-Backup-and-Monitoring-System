@@ -1,9 +1,11 @@
 from watcher import ChangeHandler, ConfigurateWatchers 
 from watchdog.observers import Observer
-from utilities import *
+from utilities import getPayload, sendPayload, uploadFiles
 import config
-from local_db import createConnection
+from local_db import createConnection, flushActions
 import time
+from classes import Payload
+
 
 conn = createConnection(config.AGENT_DB)
 handler = ChangeHandler()
@@ -20,6 +22,7 @@ while True:
         ConfigurateWatchers(observer, handler, watchers, config.WATCHED_ROOTS)
         config.WATCHED_EXTENSIONS = respond['extensions']
         config.PERIOD = respond['period']
-        maxActionList = payload.generateMaxActionPairList()
-        flushActions(conn, maxActionList)
-        uploadFiles(respond['paths'])
+        if not payload.noAction():
+            maxActionId = payload.getMaxActionId()
+            flushActions(conn, maxActionId)
+            uploadFiles(respond['paths'])

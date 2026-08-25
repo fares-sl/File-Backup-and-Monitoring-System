@@ -1,4 +1,5 @@
 venv/
 agent.db
-.vscode/
 debug.py
+test_folder/
+__pycache__/

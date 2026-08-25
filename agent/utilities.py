@@ -1,5 +1,5 @@
-from local_db import searchPath, createPath, getActions, flushPathActions
-from classes import Payload, PathActions
+from local_db import getActions
+from classes import Payload
 import socket
 import requests
 from datetime import datetime
@@ -7,26 +7,11 @@ import getpass
 import config
 from pathlib import Path
 
-def fetchActionList(cur):
-    actionList = []
-    action = cur.fetchone()
-    if action is None :
-        return actionList
-    pathActions = PathActions(action[0], action[2] - 1)
-    actionList.append(pathActions)
-    actionList[-1].appendAction(action[1], action[3], action[4], action[5])
-    for action in cur:
-        if action[0] != actionList[-1].pathName :
-            pathActions = PathActions(action[0], action[2] - 1)
-            actionList.append(pathActions)
-        actionList[-1].appendAction(action[1], action[3], action[4], action[5])
-    return actionList
-
 
 def getPayload(conn):
     cur = getActions(conn)
     hostName = socket.gethostname()
-    payload = Payload(hostName, fetchActionList(cur))
+    payload = Payload(hostName, cur.fetchall())
     return payload
 
 def sendPayload(payload):
@@ -35,7 +20,7 @@ def sendPayload(payload):
     try:
         response = requests.post(
             url,
-            json=payload.to_dict(),
+            json=payload.__dict__,
             timeout=config.TIMEOUT
         )
 
@@ -61,16 +46,8 @@ def getTime():
 def getUser():
     return getpass.getuser()
 
-def fetchActionCount(conn, filePath):
-    actionCount = searchPath(conn, filePath)
-    if not actionCount:
-        createPath(conn, filePath)
-    return actionCount
-
-def flushActions(conn, maxActionList):
-    for path in maxActionList:
-        flushPathActions(conn, path[0], path[1])
-    conn.commit()
-
 def extension(filePath):
     return Path(filePath).suffix
+
+def uploadFiles(paths):
+    print(f"paths to upload are {paths}")

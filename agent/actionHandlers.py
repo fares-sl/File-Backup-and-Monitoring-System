@@ -1,13 +1,11 @@
-from local_db import fetchLastAction, modifyActionCount, createAction
+from local_db import fetchLastAction, createAction
 from classes import Action
-from utilities import getTime , getUser, fetchActionCount
+from utilities import getTime , getUser
 from config import WATCHED_EXTENSIONS, WATCHED_ROOTS
 
 
 def actionHandler(conn, filePath, action, oldPath = None):
-    actionCount = fetchActionCount(conn, filePath)
-    createAction(conn, filePath, action, actionCount + 1, getUser(), getTime(), oldPath)
-    modifyActionCount(conn, filePath, actionCount + 1)
+    createAction(conn, filePath, action, getUser(), getTime(), oldPath)
     conn.commit()
 
 
