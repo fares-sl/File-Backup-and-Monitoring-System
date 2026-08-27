@@ -7,6 +7,7 @@ import config
 import os
 import time
 from utilities import extension
+from pathlib import Path
 
 class ChangeHandler(FileSystemEventHandler):
     def fetchConnection(self):
@@ -30,6 +31,10 @@ class ChangeHandler(FileSystemEventHandler):
             moveFileHandler(self.fetchConnection(), event.dest_path, event.src_path)
             
 def ConfigurateWatchers(observer, handler, watchers, watchedRoots):
+    watchedRoots = [
+        str(Path(root).resolve())
+        for root in watchedRoots
+    ]
     for path in list(watchers):
         if path not in watchedRoots:
             observer.unschedule(watchers[path])
