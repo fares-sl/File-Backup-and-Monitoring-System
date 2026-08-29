@@ -1,5 +1,5 @@
 from local_db import getActions
-from classes import Payload
+from classes import Payload, getActionsList
 import socket
 import requests
 from datetime import datetime
@@ -11,7 +11,7 @@ from pathlib import Path
 def getPayload(conn):
     cur = getActions(conn)
     hostName = socket.gethostname()
-    payload = Payload(hostName, cur.fetchall())
+    payload = Payload(hostName, getActionsList(cur.fetchall()))
     return payload
 
 def sendPayload(payload):
@@ -20,7 +20,7 @@ def sendPayload(payload):
     try:
         response = requests.post(
             url,
-            json=payload.__dict__,
+            json=payload.to_dict(),
             timeout=config.TIMEOUT
         )
 
