@@ -23,11 +23,11 @@ class ChangeHandler(FileSystemEventHandler):
             modifyFileHandler(self.fetchConnection(), event.src_path)
 
     def on_deleted(self, event):
-        if event.is_directory or extension(event.src_path) in config.WATCHED_EXTENSIONS:
+        if not event.is_directory and extension(event.src_path) in config.WATCHED_EXTENSIONS:
             deleteFileHandler(self.fetchConnection(), event.src_path)
         
     def on_moved(self, event):
-        if event.is_directory or extension(event.src_path) in config.WATCHED_EXTENSIONS:
+        if not event.is_directory and extension(event.src_path) in config.WATCHED_EXTENSIONS:
             moveFileHandler(self.fetchConnection(), event.dest_path, event.src_path)
             
 def ConfigurateWatchers(observer, handler, watchers, watchedRoots):
