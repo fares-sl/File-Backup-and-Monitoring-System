@@ -62,9 +62,9 @@ def resolveActions(actionDict, device_folder):
         match (actionDict[path]):
             case 'create':
                 createFile(fullPath)
-                filesToUpload.append(fullPath)
+                filesToUpload.append(path)
             case 'modify':
-                filesToUpload.append(fullPath)
+                filesToUpload.append(path)
             case 'delete':
                 deleteFile(fullPath)
     return filesToUpload

@@ -12,6 +12,11 @@ def createConnection(dbName):
     )
     """
     )
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS agent (
+        agent_id INTEGER PRIMARY KEY
+    )
+    """)
     return conn
 
 def getActions(conn):
@@ -34,5 +39,20 @@ def fetchLastAction(conn, filePath):
 def flushActions(conn, maxActionId):
     conn.execute('DELETE FROM actions WHERE id <= ?',(maxActionId,))
     conn.commit()
+
+def saveAgentId(conn, agent_id):
+    conn.execute(
+        "INSERT INTO agent (agent_id) VALUES (?)",
+        (agent_id,)
+    )
+    conn.commit()
+
+
+def getAgentId(conn):
+    result = conn.execute(
+        "SELECT agent_id FROM agent"
+    ).fetchone()
+
+    return result[0] if result else None
 
 

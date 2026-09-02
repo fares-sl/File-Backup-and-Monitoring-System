@@ -6,3 +6,4 @@ WATCHED_EXTENSIONS = ['.txt','.py']
 WATCHED_ROOTS = ['test_folder/']
 PERIOD = 1800
 AGENT_DB = 'agent.db'
+REGISTER_ENDPOINT = '/api/register'

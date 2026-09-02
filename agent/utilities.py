@@ -8,10 +8,10 @@ import config
 from pathlib import Path
 
 
-def getPayload(conn):
+def getPayload(conn, agent_id):
     cur = getActions(conn)
     hostName = socket.gethostname()
-    payload = Payload(hostName, getActionsList(cur.fetchall()))
+    payload = Payload(hostName, agent_id, getActionsList(cur.fetchall()))
     return payload
 
 def sendPayload(payload):
@@ -51,3 +51,31 @@ def extension(filePath):
 
 def uploadFiles(paths):
     print(f"paths to upload are {paths}")
+
+def registerWithServer():
+    hostName = socket.gethostname()
+    url = f"http://{config.SERVER_IP}:{config.SERVER_PORT}{config.REGISTER_ENDPOINT}"
+    jsonObject = {'hostName': hostName}
+    try:
+        response = requests.post(
+            url,
+            json=jsonObject,
+            timeout=config.TIMEOUT
+        )
+
+        response.raise_for_status()
+
+        return response.json()['agent_id']
+
+    except requests.exceptions.Timeout:
+        print("Server took too long to respond")
+        return None
+
+    except requests.exceptions.ConnectionError:
+        print("Could not connect to server")
+        return None
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Server returned an HTTP error: {e}")
+        return None
+

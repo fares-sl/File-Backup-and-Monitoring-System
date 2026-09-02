@@ -1,13 +1,20 @@
 from watcher import ChangeHandler, ConfigurateWatchers 
 from watchdog.observers import Observer
-from utilities import getPayload, sendPayload, uploadFiles
+from utilities import getPayload, sendPayload, uploadFiles, registerWithServer
 import config
-from local_db import createConnection, flushActions
+from local_db import createConnection, flushActions, getAgentId, saveAgentId
 import time
-from classes import Payload
 
 
 conn = createConnection(config.AGENT_DB)
+agent_id = getAgentId(conn)
+if agent_id is None:
+    agent_id = registerWithServer()
+    if agent_id is None:
+        print("Could not register agent with server.")
+        conn.close()
+        raise SystemExit(1)
+    saveAgentId(conn, agent_id)
 handler = ChangeHandler()
 observer = Observer()
 watchers = {}
@@ -15,9 +22,9 @@ ConfigurateWatchers(observer, handler, watchers, config.WATCHED_ROOTS)
 observer.start()
 while True:
     time.sleep(config.PERIOD)
-    payload = getPayload(conn)
+    payload = getPayload(conn, agent_id)
     respond = sendPayload(payload)
-    if respond != None:
+    if respond is not None:
         config.WATCHED_ROOTS = respond['roots']
         ConfigurateWatchers(observer, handler, watchers, config.WATCHED_ROOTS)
         config.WATCHED_EXTENSIONS = respond['extensions']
