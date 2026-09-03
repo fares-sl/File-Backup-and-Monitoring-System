@@ -2,7 +2,7 @@ from models.ActionPayload import ActionPayload
 from db_services import getLastResolvedActionId, saveAction
 from pathlib import Path
 from config import BACKUP_ROOT
-
+import shutil
 
 def filterResolvedActions(payload):
         lastResolvedAction = getLastResolvedActionId(payload.agent_id)
@@ -21,19 +21,55 @@ def concatenatePaths(backup_root, device_folder, agent_path):
         Path(backup_root) / device_folder / relative_path
     )
     
-def equivalentAction(actionA, actionB):
+def equivalentAction(actionA):
     if actionA == 'create':
         return 'create'
     return 'modify'
 
 def createFile(path):
-    print(f'file {path} created')
+    path = Path(path)
+    if path.exists():
+        print(f'file f{path} already exists')
+        return False
+    try:
+        path.parent.mkdir(parents = True, exist_ok = True)
+        path.touch()
+        print(f'file {path} created')
+        return True
+    except OSError as e:
+        print(f"Could not create {path}: {e}")
+        return False
 
 def deleteFile(path):
-    print(f'file {path} deleted')
+    path = Path(path)
+    if not path.exists():
+        print(f'file f{path} does not exist')
+        return False
+    try:
+        path.unlink()
+        print(f'file {path} deleted')
+        return True
+    except OSError as e:
+        print(f"Could not delete {path}: {e}")
+        return False
 
-def moveFile(oldPath, newpath):
-    print(f'{oldPath} moved to {newpath}')
+def moveFile(oldPath, newPath):
+    oldPath = Path(oldPath)
+    if not oldPath.exists():
+        print(f'file f{path} does not exists')
+        return False
+    newPath = Path(newPath)
+    if newPath.exists():
+        print(f'file f{path} already exists')
+        return False
+    try:
+        newPath.parent.mkdir(parents = True, exist_ok = True)
+        shutil.move(str(oldPath), str(newPath))
+        print(f"File {oldPath} moved to {newPath}")
+        return True
+    except OSError as e:
+        print(f"Could not move {oldPath} to {newPath}: {e}")
+        return False
 
 
 def getequivalentActionsList(actions, device_folder):
@@ -50,7 +86,7 @@ def getequivalentActionsList(actions, device_folder):
                 del actionDict[action.path]
         else:
             if action.path in actionDict:
-                actionDict[action.path] = equivalentAction(actionDict[action.path], action.action.value)
+                actionDict[action.path] = equivalentAction(actionDict[action.path])
             else:
                 actionDict[action.path] = action.action.value
     return actionDict
@@ -60,10 +96,8 @@ def resolveActions(actionDict, device_folder):
     for path in actionDict:
         fullPath = concatenatePaths(BACKUP_ROOT, device_folder, path)
         match (actionDict[path]):
-            case 'create':
+            case 'create' | 'modify':
                 createFile(fullPath)
-                filesToUpload.append(path)
-            case 'modify':
                 filesToUpload.append(path)
             case 'delete':
                 deleteFile(fullPath)

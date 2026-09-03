@@ -21,7 +21,7 @@ class ActionObject:
             "path": self.path,
             "action": self.action,
             "user": self.user,
-            "actionTime": self.actionTime,
+            "time": self.actionTime,
             "oldPath": self.oldPath
         }
 

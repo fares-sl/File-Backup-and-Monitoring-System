@@ -15,6 +15,7 @@ if agent_id is None:
         conn.close()
         raise SystemExit(1)
     saveAgentId(conn, agent_id)
+print(f'agent id: {agent_id}')
 handler = ChangeHandler()
 observer = Observer()
 watchers = {}

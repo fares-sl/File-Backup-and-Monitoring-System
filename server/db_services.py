@@ -12,7 +12,7 @@ def fetchExtensions(agent_id):
 
 
 def fetchRoots(agent_id):
-    return ['test_folder/']
+    return ['/home/fares/work/projet_stage/agent/test_folder/']
 
 
 def fetchPeriod(agent_id):
