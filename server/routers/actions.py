@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from models.ActionPayload import ActionPayload
 from models.AgentConfig import AgentConfig
 from services.action_services import filterResolvedActions, SaveNewLogs, getequivalentActionsList, resolveActions
-from db_services import fetchExtensions, fetchPeriod, fetchRoots
+from database.db_services import fetchExtensions, fetchPeriod, fetchRoots
 
 router = APIRouter()
 
@@ -10,7 +10,7 @@ router = APIRouter()
 def receive_actions(payload : ActionPayload) -> AgentConfig :
     actions = filterResolvedActions(payload)
     print(f"actions to resolve: {actions}")
-    SaveNewLogs(actions)
+    SaveNewLogs(actions, payload.agent_id)
     device_folder = str(payload.agent_id)
     equivalentActionsList = getequivalentActionsList(actions, device_folder)
     print(f'equivalentActions: {equivalentActionsList}')

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from db_services import generateAgentId
+from database.db_services import generateAgentId
 from models.AgentRegister import AgentRegister
 
 router = APIRouter()

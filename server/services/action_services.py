@@ -1,5 +1,5 @@
 from models.ActionPayload import ActionPayload
-from db_services import getLastResolvedActionId, saveAction
+from database.db_services import getLastResolvedActionId, saveAction
 from pathlib import Path
 from config import BACKUP_ROOT
 import shutil
@@ -10,9 +10,9 @@ def filterResolvedActions(payload):
             payload.actions.pop(0)
         return payload.actions
 
-def SaveNewLogs(actions):
+def SaveNewLogs(actions, agent_id):
         for action in actions :
-            saveAction(action)
+            saveAction(action, agent_id)
 
 def concatenatePaths(backup_root, device_folder, agent_path):
     relative_path = agent_path.lstrip("/")
@@ -56,11 +56,11 @@ def deleteFile(path):
 def moveFile(oldPath, newPath):
     oldPath = Path(oldPath)
     if not oldPath.exists():
-        print(f'file f{path} does not exists')
+        print(f'file f{oldPath} does not exists')
         return False
     newPath = Path(newPath)
     if newPath.exists():
-        print(f'file f{path} already exists')
+        print(f'file f{newPath} already exists')
         return False
     try:
         newPath.parent.mkdir(parents = True, exist_ok = True)
