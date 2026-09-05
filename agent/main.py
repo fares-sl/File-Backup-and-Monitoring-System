@@ -33,4 +33,4 @@ while True:
         if not payload.noAction():
             maxActionId = payload.getMaxActionId()
             flushActions(conn, maxActionId)
-            uploadFiles(respond['paths'])
+            uploadFiles(respond['paths'], agent_id)

@@ -7,3 +7,4 @@ WATCHED_ROOTS = ['/home/fares/work/projet_stage/agent/test_folder/']
 PERIOD = 1800
 AGENT_DB = 'agent.db'
 REGISTER_ENDPOINT = '/api/register'
+UPLOAD_ENDPOINT = '/api/upload'

