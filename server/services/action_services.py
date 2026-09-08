@@ -1,7 +1,7 @@
 from models.ActionPayload import ActionPayload
 from database.db_services import getLastResolvedActionId, saveAction
 from pathlib import Path
-from config import BACKUP_ROOT
+import config
 import shutil
 
 def filterResolvedActions(payload):
@@ -40,19 +40,6 @@ def createFile(path):
         print(f"Could not create {path}: {e}")
         return False
 
-def deleteFile(path):
-    path = Path(path)
-    if not path.exists():
-        print(f'file f{path} does not exist')
-        return False
-    try:
-        path.unlink()
-        print(f'file {path} deleted')
-        return True
-    except OSError as e:
-        print(f"Could not delete {path}: {e}")
-        return False
-
 def moveFile(oldPath, newPath):
     oldPath = Path(oldPath)
     if not oldPath.exists():
@@ -72,16 +59,22 @@ def moveFile(oldPath, newPath):
         return False
 
 
+def deleteFile(path, device_folder, time):
+    newPath = concatenatePaths(config.BIN_ROOT, device_folder, path + '_' + time.replace(':', '-').replace(' ', '_'))
+    oldPath = concatenatePaths(config.BACKUP_ROOT, device_folder, path)
+    moveFile(oldPath, newPath)
+
+
 def getequivalentActionsList(actions, device_folder):
     actionDict = {}
     for action in actions :
         if action.action.value == 'move':
-            moveFile(concatenatePaths(BACKUP_ROOT, device_folder,action.oldPath), concatenatePaths(BACKUP_ROOT, device_folder,action.path))
+            moveFile(concatenatePaths(config.BACKUP_ROOT, device_folder,action.oldPath), concatenatePaths(config.BACKUP_ROOT, device_folder,action.path))
             if action.oldPath in actionDict:
                 actionDict[action.path] = 'create'
                 del actionDict[action.oldPath]
         elif action.action.value == 'delete':
-            deleteFile(concatenatePaths(BACKUP_ROOT, device_folder,action.path))
+            deleteFile(action.path, device_folder, action.time)
             if action.path in actionDict:
                 del actionDict[action.path]
         else:
@@ -94,11 +87,7 @@ def getequivalentActionsList(actions, device_folder):
 def resolveActions(actionDict, device_folder):
     filesToUpload = []
     for path in actionDict:
-        fullPath = concatenatePaths(BACKUP_ROOT, device_folder, path)
-        match (actionDict[path]):
-            case 'create' | 'modify':
-                createFile(fullPath)
-                filesToUpload.append(path)
-            case 'delete':
-                deleteFile(fullPath)
+        fullPath = concatenatePaths(config.BACKUP_ROOT, device_folder, path)
+        createFile(fullPath)
+        filesToUpload.append(path)
     return filesToUpload
