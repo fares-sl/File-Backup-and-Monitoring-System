@@ -27,9 +27,9 @@ class ActionObject:
 
 
 class Payload:
-    def __init__(self, hostName, agent_id, actions):
-        self.hostName = hostName
-        self.agent_id = agent_id
+    def __init__(self, user, device_id, actions):
+        self.user = user
+        self.device_id = device_id
         self.actions = actions
 
     def noAction(self):
@@ -40,8 +40,8 @@ class Payload:
 
     def to_dict(self):
         return {
-            "hostName": self.hostName,
-            "agent_id": self.agent_id,
+            "user": self.user,
+            "device_id": self.device_id,
             "actions": [
                 action.to_dict()
                 for action in self.actions

@@ -1,10 +1,10 @@
 from fastapi import APIRouter
-from database.db_services import generateAgentId
-from models.AgentRegister import AgentRegister
+from database.db_services import generateDeviceId
+from models.DeviceRegister import DeviceRegister
 
 router = APIRouter()
 
 @router.post('/api/register')
 
-def register_agent(registerObject : AgentRegister) :
-    return {"agent_id": generateAgentId(registerObject.hostName)}
+def register_Device(registerObject : DeviceRegister) :
+    return {"device_id": generateDeviceId(registerObject.hostName, registerObject.platform, registerObject.mac)}

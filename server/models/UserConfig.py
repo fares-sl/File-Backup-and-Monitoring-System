@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class AgentConfig(BaseModel):
+class UserConfig(BaseModel):
     roots : list[str]
     extensions : list[str]
     period : int

@@ -16,11 +16,11 @@ class Action(BaseModel):
     oldPath : str | None = None
 
 class ActionPayload(BaseModel):
-    agent_id : int
-    hostName : str
+    device_id : int
+    user : str
     actions : list[Action]
 
     def getDeviceId(self):
-        return self.agent_id
+        return self.device_id
 
 
