@@ -5,7 +5,7 @@ import config
 import shutil
 
 def filterResolvedActions(payload):
-        lastResolvedAction = getLastResolvedActionId(payload.agent_id, payload.user)
+        lastResolvedAction = getLastResolvedActionId(payload.device_id, payload.user)
         while payload.actions and payload.actions[0].id <= lastResolvedAction :
             payload.actions.pop(0)
         return payload.actions

@@ -6,10 +6,10 @@ router = APIRouter()
 
 @router.post('/api/upload')
 async def upload_file(
-    agent_id : int = Form(...),
+    device_id : int = Form(...),
     path : str = Form(...),
     file : UploadFile = File(...)
 ):
     data = await file.read()
-    with open(concatenatePaths(config.BACKUP_ROOT, str(agent_id), path),'wb') as f:
+    with open(concatenatePaths(config.BACKUP_ROOT, str(device_id), path),'wb') as f:
         f.write(data)
