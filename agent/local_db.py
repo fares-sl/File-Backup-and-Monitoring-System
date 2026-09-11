@@ -118,3 +118,9 @@ def deleteExtensions(conn, user):
 def deleteRoots(conn, user):
     conn.execute('DELETE FROM root WHERE user = ?',(user,))
     conn.commit()
+
+def initializeActionId(conn, id):
+    conn.execute('INSERT INTO actions (id ,filepath, action, user, action_time, old_path) VALUES (?,?,?,?,?,?);',(id,'a','delete','a','a','a'))
+    conn.commit()
+    conn.execute('DELETE FROM actions;')
+    conn.commit()

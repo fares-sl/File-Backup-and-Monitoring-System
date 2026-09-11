@@ -1,6 +1,6 @@
 from models.ActionPayload import ActionPayload
 from database.db_services import getLastResolvedActionId, saveAction
-from pathlib import Path
+from pathlib import Path, PureWindowsPath, PurePosixPath
 import config
 import shutil
 
@@ -15,11 +15,15 @@ def SaveNewLogs(actions, agent_id):
             saveAction(action, agent_id)
 
 def concatenatePaths(backup_root, device_folder, agent_path):
-    relative_path = agent_path.lstrip("/")
-    relative_path = relative_path.replace("\\", "/")
-    return str(
-        Path(backup_root) / device_folder / relative_path
-    )
+    if agent_path[0] == '/':
+        path = PurePosixPath(agent_path)
+    else:
+        path = PureWindowsPath(agent_path)
+    path_parts = path.parts
+    clean_path = path_parts[2:]
+    return (
+        Path(backup_root) / device_folder / Path(*clean_path)
+    ).as_posix()
     
 def equivalentAction(actionA):
     if actionA == 'create':

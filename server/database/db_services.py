@@ -3,6 +3,7 @@ from database.models.actions import Action
 from database.models.device import Device
 from database.models.User import User
 import config
+from sqlalchemy import select, func
 
 def saveAction(action, device_id):
     with SessionLocal() as session:
@@ -27,12 +28,23 @@ def getLastResolvedActionId(device_id, user):
         return user_db.last_resolved_action_id
 
 
-def generateDeviceId(hostName, platform, mac):
+
+def generateDeviceId(hostName, platform, mac_addresses):
     with SessionLocal() as session:
+        statment=(
+            select(Device).where(Device.mac.overlap(mac_addresses)).limit(1) 
+        )
+        device = session.scalar(statment)
+        if device is not None:
+            device.hostname = hostName
+            device.platform = platform
+            device.mac = mac_addresses
+            session.commit()
+            return device.device_id
         device = Device(
             hostname = hostName,
             platform = platform,
-            mac = mac
+            mac = mac_addresses
         )
         session.add(device)
         session.commit()
@@ -69,3 +81,8 @@ def fetchPeriod(device_id, user):
     with SessionLocal() as session:
         user_db = session.get(User, (device_id, user))
         return user_db.period
+
+def getLastDeviceResolvedActionId(device_id):
+    with SessionLocal() as session:
+        stmt = select(func.max(User.last_resolved_action_id)).where(User.device_id == device_id)
+        return session.execute(stmt).scalar() or 0

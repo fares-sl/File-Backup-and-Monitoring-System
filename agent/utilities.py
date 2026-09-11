@@ -110,7 +110,7 @@ def registerWithServer():
 
         response.raise_for_status()
 
-        return response.json()['device_id']
+        return response.json()
 
     except requests.exceptions.Timeout:
         print("Server took too long to respond")
