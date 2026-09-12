@@ -5,3 +5,4 @@ class UserConfig(BaseModel):
     extensions : list[str]
     period : int
     paths : list[str]
+    paths_to_download : list[str]

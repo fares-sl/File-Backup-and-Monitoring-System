@@ -8,7 +8,7 @@ import config
 from pathlib import Path
 import psutil
 import platform
-
+import re
 
 
 def getPayload(conn, device_id, user):
@@ -132,6 +132,14 @@ def getDefaultWatchedRoot():
     )
     return str(default_root)
 
+def getBackupFolder():
+    default_root = Path.home() / 'FIM_BACKUP'
+    default_root.mkdir(
+        parents = True,
+        exist_ok = True
+    )
+    return str(default_root)
+
 def registerUser(user, device_id):
     url = f"http://{config.SERVER_IP}:{config.SERVER_PORT}{config.REGISTER_USER_ENDPOINT}"
     jsonObject = {'device_id':device_id , 'user': user, 'watched_roots': config.WATCHED_ROOTS, 'watched_extensions': config.WATCHED_EXTENSIONS, 'period': config.PERIOD}
@@ -188,3 +196,36 @@ def saveNewRoots(conn, user):
 
 def saveNewPeriod(conn, user):
     modifyPeriod(conn, user, config.PERIOD)
+
+def downloadFiles(paths):
+    for path in paths:
+        url = f"http://{config.SERVER_IP}:{config.SERVER_PORT}{config.DOWNLOAD_FILE_ENDPOINT}"
+        jsonObject = {'device_id': config.DEVICE_ID, 'user': config.USER, 'path': path}
+
+        try:
+            response = requests.post(
+                url,
+                json=jsonObject,
+                stream=True,
+                timeout=(config.TIMEOUT, 30)
+            )
+
+            if response.status_code != 200:
+                raise RuntimeError(f"Download failed ({response.status_code}): {response.text}")
+
+            content_disp = response.headers.get("content-disposition", "")
+            match = re.search(r'filename="?([^"]+)"?', content_disp)
+            filename = match.group(1) if match else Path(path).name
+
+            local_save_path = Path(config.BACKUP_FOLDER) / filename
+            local_save_path.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(local_save_path, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+
+            print(f'file {path} downloaded')
+
+        except Exception as e:
+            print(f"Failed to download {path}: {e}")
+            continue

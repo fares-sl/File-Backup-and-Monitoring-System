@@ -86,3 +86,23 @@ def getLastDeviceResolvedActionId(device_id):
     with SessionLocal() as session:
         stmt = select(func.max(User.last_resolved_action_id)).where(User.device_id == device_id)
         return session.execute(stmt).scalar() or 0
+
+def fetchPathsToDownload(device_id, user):
+    with SessionLocal() as session:
+        statment = select(User.paths_to_download).where(User.device_id == device_id, User.user == user)
+        return session.execute(statment).scalar_one_or_none()
+
+def DownloadRequestExists(device_id, user, path):
+    return path in fetchPathsToDownload(device_id, user)
+
+
+def cleanDownloadedPath(device_id, user, path):
+    with SessionLocal() as session:
+        db_user = session.get(User, (device_id, user))
+        db_user.paths_to_download = [p for p in db_user.paths_to_download if p != path]
+        session.commit()
+
+def userExists(device_id, user):
+    with SessionLocal() as session:
+        db_user = session.get(User, (device_id, user))
+        return db_user is not None

@@ -10,3 +10,6 @@ REGISTER_ENDPOINT = '/api/register'
 UPLOAD_ENDPOINT = '/api/upload'
 REGISTER_USER_ENDPOINT = '/api/register_user'
 USER = ''
+DOWNLOAD_FILE_ENDPOINT = '/api/download_file'
+BACKUP_FOLDER = ''
+DEVICE_ID = 0

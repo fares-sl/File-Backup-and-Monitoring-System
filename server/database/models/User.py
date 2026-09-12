@@ -11,3 +11,4 @@ class User(Base):
     watched_extensions : Mapped[list[str]] = mapped_column(ARRAY(String), nullable = False)
     period : Mapped[int] = mapped_column(Integer, nullable = False)
     last_resolved_action_id : Mapped[int] = mapped_column(Integer, default = 0, nullable = False)
+    paths_to_download : Mapped[list[str]] = mapped_column(ARRAY(String), default = [], nullable = False)

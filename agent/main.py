@@ -1,6 +1,6 @@
 from watcher import ChangeHandler, ConfigurateWatchers 
 from watchdog.observers import Observer
-from utilities import getPayload, sendPayload, uploadFiles, registerWithServer, getUser, registerUser, addUser, getUserConfig, getDefaultWatchedRoot, saveNewRoots, saveNewExtensions, saveNewPeriod
+from utilities import getPayload, sendPayload, uploadFiles, registerWithServer, getUser, registerUser, addUser, getUserConfig, getDefaultWatchedRoot, saveNewRoots, saveNewExtensions, saveNewPeriod, downloadFiles, getBackupFolder
 import config
 from local_db import createConnection, flushActions, getdeviceId, savedeviceId, findUser, initializeActionId
 import time
@@ -18,10 +18,12 @@ if device_id is None:
     initializeActionId(conn, device_config['last_action_id'])
     savedeviceId(conn, device_id)
 print(f'agent id: {device_id}')
+config.DEVICE_ID = device_id
 user = getUser()
 config.USER = user
 if not findUser(conn, user):
     config.WATCHED_ROOTS = [getDefaultWatchedRoot()]
+    config.BACKUP_FOLDER = getBackupFolder()
     if registerUser(user, device_id) is None:
         print('could not register user with the server')
         raise SystemExit(2)
@@ -52,3 +54,4 @@ while True:
             print(maxActionId)
             flushActions(conn, maxActionId, user)
             uploadFiles(respond['paths'], device_id)
+        downloadFiles(respond['paths_to_download'])
